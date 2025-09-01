@@ -38,9 +38,29 @@ format:
 	ruff check --fix
 	ruff format
 
+## Bajamos las imágenes de ondrive
+.PHONY: download_data
 
+download_data:
+	$(PYTHON_INTERPRETER) panificadora/data/download_data.py
+	
+extract_data:
+	$(PYTHON_INTERPRETER) panificadora/data/extract_data.py
 
+guardar_imagenes_barra:
+	$(PYTHON_INTERPRETER) panificadora/data/grabar_imagenes_barra.py
+	
+quitar_brillos_imagenes:
+	$(PYTHON_INTERPRETER) panificadora/data/quitar_brillos_imagenes.py \
+		--e data/interim/Frimar/bijou/train \
+		-salida data/interim/Frimar/bijou/train3 \
+		-funcion quitar
 
+mascara_brillos:
+	$(PYTHON_INTERPRETER) panificadora/data/quitar_brillos_imagenes.py \
+		--e data/interim/Frimar/bijou/test/Barra_brillo \
+		-salida data/interim/Frimar/bijou/test/Barra_brillo/mascara \
+		-funcion mascara
 
 ## Set up Python interpreter environment
 .PHONY: create_environment
