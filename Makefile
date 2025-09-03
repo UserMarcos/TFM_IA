@@ -62,6 +62,9 @@ mascara_brillos:
 		-salida data/interim/Frimar/bijou/test/Barra_brillo/mascara \
 		-funcion mascara
 
+probar_anomalib:
+	$(PYTHON_INTERPRETER) panificadora/anomalib/pruebas.py
+
 ## Set up Python interpreter environment
 .PHONY: create_environment
 create_environment:
