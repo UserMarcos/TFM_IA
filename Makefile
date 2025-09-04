@@ -64,6 +64,9 @@ mascara_brillos:
 
 probar_anomalib:
 	$(PYTHON_INTERPRETER) panificadora/anomalib/pruebas.py
+	
+inferencia_anomalib:
+	$(PYTHON_INTERPRETER) panificadora/anomalib/probar_inferencia.py
 
 ## Set up Python interpreter environment
 .PHONY: create_environment
