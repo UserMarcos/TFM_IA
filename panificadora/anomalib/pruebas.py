@@ -1,7 +1,7 @@
 import anomalib
-from anomalib.data import Folder
-from pathlib import Path
-import os
+#from anomalib.data import Folder
+#from pathlib import Path
+#import os
 import torch
 #from torchvision.transforms import v2
 #from anomalib.models import Patchcore
@@ -9,7 +9,7 @@ import torch
 #from anomalib.engine import Engine
 #from anomalib.data import MVTecAD
 from datamodule_folder import get_datamodule, get_modelo_PatchCore, get_engine
-
+import timm
 # python_env\anomalib\Scripts\activate
 # cd Documents\GitHub\TFM_IA
 # make probar_anomalib
@@ -18,12 +18,13 @@ if __name__ == '__main__':
     print("Versión de anomalib: ",anomalib.__version__)
     print("Es compatible con cuda:", torch.cuda.is_available())
     print("Es compatible con xpu:", torch.xpu.is_available())
+    
+    #for model_name in timm.list_models(pretrained=True): print(model_name)
 
     datamodule = get_datamodule()
 
 
     '''
-    
     datamodule = MVTecAD(
         root=carpeta,  # Path to download/store the dataset
         category="bottle",  # MVTec category to use
@@ -47,7 +48,6 @@ if __name__ == '__main__':
     print("Formato de la imagen: ", batch.items[23].image.shape)
 
     print(datamodule.train_augmentations)
-    
     
     model = Patchcore(
         #backbone="wide_resnet50_2",

@@ -6,6 +6,7 @@ from anomalib.models import Cflow, EfficientAd, Dsr, Patchcore
 #from anomalib.loggers import AnomalibMLFlowLogger
 from lightning.pytorch.loggers import TensorBoardLogger
 from anomalib.engine import Engine
+from anomalib.callbacks import TilerConfigurationCallback
 
 def get_datamodule():
     carpeta = Path("data/processed/bijou")
@@ -22,13 +23,15 @@ def get_datamodule():
     augmentations_train = v2.Compose([
         v2.Pad(50, 255, "edge"),
         v2.CenterCrop(256), 
+        v2.Resize(128),
         v2.RandomHorizontalFlip(),
         v2.RandomVerticalFlip()   
     ])
     
     augmentations_valid = v2.Compose([
         v2.Pad(50, 255, "edge"),
-        v2.CenterCrop(256)   
+        v2.CenterCrop(256),
+        v2.Resize(128)
     ])
     
     datamodule_folder = Folder(
@@ -84,7 +87,7 @@ def get_modelo_CFlow():
         #layers=["layer1", "layer2", "layer3"],
         #coreset_sampling_ratio=0.1,
         #pre_processor = exportable_transform
-        evaluator = evaluator
+        #evaluator = evaluator
     )
     return modelo
 
@@ -122,10 +125,11 @@ def get_modelo_PatchCore():
     evaluator = get_evaluator()
 
     modelo = Patchcore(
-        #backbone="resnet18",
-        #layers=["layer1", "layer2", "layer3"],
+        backbone= "resnet18",
+        layers=["layer3"],
         #coreset_sampling_ratio=0.1,
         #pre_processor = exportable_transform
+        num_neighbors = 3,
         evaluator = evaluator
     )
     return modelo
@@ -134,14 +138,17 @@ def get_engine():
 
     #mlflow_logger = AnomalibMLFlowLogger()
     logger = TensorBoardLogger("tb_logs", name="anomalib_experiment")
+    tiler_config_callback = TilerConfigurationCallback(enable=True, tile_size=64, stride=64)
 
     motor = Engine(
         max_epochs=1,  # Override default trainer settings
         logger=logger,
         #check_val_every_n_epoch=5
         #input_size = [128, 128]
-        precision="16-mixed"
+        #precision= "bf16-mixed", #"16-mixed",
+        #callbacks=[tiler_config_callback]
         #default_root_dir=Path("./mis_resultados")
+        #accelerator="cpu"
     )
 
     return motor
