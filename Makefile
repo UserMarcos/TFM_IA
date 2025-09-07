@@ -58,8 +58,8 @@ quitar_brillos_imagenes:
 
 mascara_brillos:
 	$(PYTHON_INTERPRETER) panificadora/data/quitar_brillos_imagenes.py \
-		--e data/interim/Frimar/bijou/test/Barra_brillo \
-		-salida data/interim/Frimar/bijou/test/Barra_brillo/mascara \
+		--e data/interim/Frimar/bijou/test/Brillos \
+		-salida data/interim/Frimar/bijou/test/Brillos/mascara \
 		-funcion mascara
 
 probar_anomalib:
@@ -67,6 +67,9 @@ probar_anomalib:
 	
 inferencia_anomalib:
 	$(PYTHON_INTERPRETER) panificadora/anomalib/probar_inferencia.py
+
+test_anomalib:
+	$(PYTHON_INTERPRETER) panificadora/anomalib/probar_test.py
 
 ## Set up Python interpreter environment
 .PHONY: create_environment

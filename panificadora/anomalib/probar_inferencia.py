@@ -4,74 +4,83 @@ This example shows how to perform inference on a trained model
 using the Anomalib Python API.
 """
 
-from anomalib.models import Cflow
 from anomalib.engine import Engine
-from torchvision.transforms import v2
-from pathlib import Path
-from anomalib.data import Folder
+#from torchvision.transforms import v2
+#from pathlib import Path
+#from anomalib.data import Folder
+from datamodule_folder import get_datamodule, get_modelo, get_engine
+from anomalib.metrics import AUROC, AUPRO, AUPR
+
 
 if __name__ == '__main__':
 
-    model = Cflow(
-        #backbone="resnet18",
-        #layers=["layer1", "layer2", "layer3"],
-        #coreset_sampling_ratio=0.1,
-        #pre_processor = exportable_transform
-    )
+    model = get_modelo()
 
     print("Modelo creado")
         
-    engine = Engine(
-        max_epochs=1,  # Override default trainer settings
-        #input_size = [128, 128]
-        #precision="16-mixed"
-        #default_root_dir=Path("./mis_resultados")
-    )
+    engine = get_engine()
 
     print("Engine creado")
-
-    # Creamos el data agumentation
-    augmentations_train = v2.Compose([
-        v2.Pad(50, 255, "edge"),
-        v2.CenterCrop(256), 
-        v2.RandomHorizontalFlip(),
-        v2.RandomVerticalFlip()   
-    ])
-    
-    augmentations_valid = v2.Compose([
-        v2.Pad(50, 255, "edge"),
-        v2.CenterCrop(256)   
-    ])
-    
-    carpeta = Path("data/processed/bijou2")
-    
-    datamodule = Folder(
-        name="Bijou",
-        root=carpeta,
-        normal_dir="train2",
-        abnormal_dir="Barra_brillo",
-        mask_dir = "mascara",
-        train_batch_size=4,
-        eval_batch_size=4,
-        num_workers = 1,
-        train_augmentations = augmentations_train,
-        val_augmentations = augmentations_valid,
-        test_augmentations = augmentations_valid,
-        augmentations = None
-    )
+      
+    datamodule = get_datamodule()
     
     print("Datamodule creado")
 
+    #datamodule.setup(stage = "fit")
+    #mi_DataLoader = datamodule.train_dataloader()
+
+    #datamodule.setup(stage = "test")
+    #mi_DataLoader = datamodule.test_dataloader()
+
+    #print("DataLoader creado")
+
     prediciones = engine.predict(model=model, 
-                                datamodule = datamodule, 
-                                ckpt_path = "results/Cflow/Bijou/v0/weights/lightning/model.ckpt")
+                                datamodule = datamodule,
+                                #dataloaders = mi_DataLoader,
+                                ckpt_path = "results/Cflow/Bijou/latest/weights/lightning/model.ckpt"
+                                )
     
     print("Prediciones creadas tipo:", type(prediciones))
-    
+    print("Cantidad de batch:", len(prediciones))
     batch = prediciones[0]
     print("Formato del batch: ", batch.image.shape)
     print("Tamaño del batch: ", batch.batch_size)
+    print("Tamaño de 'image_path':", len(batch.image_path))
+    print("Valor de 'image_path':", batch.image_path[0])
+    print("Tipo de 'anomaly_map':", type(batch.anomaly_map))
+    print("Formato de 'anomaly_map':", batch.anomaly_map.shape)
+    print("Tipo de 'pred_label':", type(batch.pred_label))
+    print("Formato de 'pred_label':", batch.pred_label.shape)
+    print(f"Valores de 'pred_label': {batch.pred_label[0]}, {batch.pred_label[1]}, {batch.pred_label[2]}...")
+    print("Tipo de 'pred_score':", type(batch.pred_score))
+    print("Formato de 'pred_score':", batch.pred_score.shape)
+    print(f"Valores de 'pred_score': {batch.pred_score[0]}, {batch.pred_score[1]}, {batch.pred_score[2]}...")
     
+
+    image_auroc = AUROC(fields=["pred_score", "gt_label"], prefix="image_")
+    image_aupr = AUPR(fields=["pred_score", "gt_label"], prefix="image_")
+    pixel_auroc = AUROC(fields=["anomaly_map", "gt_mask"], prefix="pixel_")
+    pixel_aupr = AUPR(fields=["anomaly_map", "gt_mask"], prefix="pixel_")
+
+
+    # name that will be used by Lightning when logging the metrics
+    print(image_auroc.name)  # 'image_AUROC'
+    print(image_aupr.name)
+    print(pixel_auroc.name)  # 'pixel_AUROC'
+    print(pixel_aupr.name)
+
+    for batch in prediciones:
+        image_auroc.update(batch)
+        image_aupr.update(batch)
+        pixel_auroc.update(batch)
+        pixel_aupr.update(batch)
+
+    print("Puntuación AUROC imagen:", image_auroc.compute())
+    print("Puntuación AUPR imagen:", image_aupr.compute())
+    print("Puntuación AUROC pixel:", pixel_auroc.compute())
+    print("Puntuación AUPR pixel:", pixel_aupr.compute())
+
+    '''
     # 5. Access the results
     if prediciones is not None:
         for i, prediction in enumerate(prediciones):
@@ -83,3 +92,4 @@ if __name__ == '__main__':
             if i >= 3 :
                 print(type(prediction))
                 break
+    '''

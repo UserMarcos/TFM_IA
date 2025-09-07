@@ -3,12 +3,7 @@ from anomalib.data import Folder
 from pathlib import Path
 import os
 import torch
-#from torchvision.transforms import v2
-#from anomalib.models import Patchcore
-#from anomalib.models import Cflow
-#from anomalib.engine import Engine
-#from anomalib.data import MVTecAD
-from datamodule_folder import get_datamodule, get_modelo_PatchCore, get_engine
+from datamodule_folder import get_datamodule, get_modelo, get_engine
 
 # python_env\anomalib\Scripts\activate
 # cd Documents\GitHub\TFM_IA
@@ -57,12 +52,15 @@ if __name__ == '__main__':
     )
     '''
     
-    model = get_modelo_PatchCore()
+    model = get_modelo()
     
     print(model.trainer_arguments)
     
     engine = get_engine()
     print("Clase engine creada")
     
-    engine.fit(datamodule=datamodule, model=model)
+    #engine.fit(datamodule=datamodule, model=model)
 
+    engine.test(datamodule=datamodule, 
+                model=model, 
+                ckpt_path = "results/Cflow/Bijou/latest/weights/lightning/model.ckpt")
