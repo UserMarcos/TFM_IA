@@ -63,7 +63,10 @@ mascara_brillos:
 		-funcion mascara
 
 probar_anomalib:
-	$(PYTHON_INTERPRETER) panificadora/anomalib/pruebas.py
+	$(PYTHON_INTERPRETER) panificadora/anomalib/pruebas.py \
+		-modelo Dsr \
+		-bs 8 \
+		-ep 3
 	
 inferencia_anomalib:
 	$(PYTHON_INTERPRETER) panificadora/anomalib/probar_inferencia.py

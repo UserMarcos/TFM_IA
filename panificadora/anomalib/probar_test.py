@@ -3,7 +3,7 @@ from anomalib.data import Folder
 from pathlib import Path
 import os
 import torch
-from datamodule_folder import get_datamodule, get_modelo, get_engine
+from datamodule_folder import get_datamodule, get_modelo_CFlow, get_engine
 
 # python_env\anomalib\Scripts\activate
 # cd Documents\GitHub\TFM_IA
@@ -52,7 +52,7 @@ if __name__ == '__main__':
     )
     '''
     
-    model = get_modelo()
+    model = get_modelo_CFlow()
     
     print(model.trainer_arguments)
     
@@ -63,4 +63,5 @@ if __name__ == '__main__':
 
     engine.test(datamodule=datamodule, 
                 model=model, 
-                ckpt_path = "results/Cflow/Bijou/latest/weights/lightning/model.ckpt")
+                ckpt_path = "results/Cflow/Bijou_b/latest/weights/lightning/model.ckpt"
+                )
