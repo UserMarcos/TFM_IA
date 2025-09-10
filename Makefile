@@ -58,8 +58,8 @@ quitar_brillos_imagenes:
 
 mascara_brillos:
 	$(PYTHON_INTERPRETER) panificadora/data/quitar_brillos_imagenes.py \
-		--e data/interim/Frimar/bijou/test/Brillos \
-		-salida data/interim/Frimar/bijou/test/Brillos/mascara \
+		--e data/processed/bijou/test/Barra_brillo \
+		-salida data/processed/bijou/mascara/Barra_brillo \
 		-funcion mascara
 
 probar_anomalib:
