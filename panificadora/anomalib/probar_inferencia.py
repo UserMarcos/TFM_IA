@@ -8,13 +8,13 @@ from anomalib.engine import Engine
 #from torchvision.transforms import v2
 #from pathlib import Path
 #from anomalib.data import Folder
-from datamodule_folder import get_datamodule, get_modelo, get_engine
+from datamodule_folder import get_datamodule, get_modelo_CFlow, get_engine
 from anomalib.metrics import AUROC, AUPRO, AUPR
 
 
 if __name__ == '__main__':
 
-    model = get_modelo()
+    model = get_modelo_CFlow()
 
     print("Modelo creado")
         
@@ -37,7 +37,7 @@ if __name__ == '__main__':
     prediciones = engine.predict(model=model, 
                                 datamodule = datamodule,
                                 #dataloaders = mi_DataLoader,
-                                ckpt_path = "results/Cflow/Bijou/latest/weights/lightning/model.ckpt"
+                                ckpt_path = "results/Cflow/Bijou_b/latest/weights/lightning/model.ckpt"
                                 )
     
     print("Prediciones creadas tipo:", type(prediciones))
@@ -61,13 +61,14 @@ if __name__ == '__main__':
     image_aupr = AUPR(fields=["pred_score", "gt_label"], prefix="image_")
     pixel_auroc = AUROC(fields=["anomaly_map", "gt_mask"], prefix="pixel_")
     pixel_aupr = AUPR(fields=["anomaly_map", "gt_mask"], prefix="pixel_")
-
+    pixel_aupro = AUPRO(fields=["anomaly_map", "gt_mask"], prefix="pixel_")
 
     # name that will be used by Lightning when logging the metrics
     print(image_auroc.name)  # 'image_AUROC'
     print(image_aupr.name)
     print(pixel_auroc.name)  # 'pixel_AUROC'
     print(pixel_aupr.name)
+    print(pixel_aupro.name)
 
     for batch in prediciones:
         image_auroc.update(batch)
@@ -76,9 +77,10 @@ if __name__ == '__main__':
         pixel_aupr.update(batch)
 
     print("Puntuación AUROC imagen:", image_auroc.compute())
-    print("Puntuación AUPR imagen:", image_aupr.compute())
     print("Puntuación AUROC pixel:", pixel_auroc.compute())
+    print("Puntuación AUPR imagen:", image_aupr.compute())
     print("Puntuación AUPR pixel:", pixel_aupr.compute())
+    print("Puntuación AUPRO pixel:", pixel_aupr.compute())
 
     '''
     # 5. Access the results
