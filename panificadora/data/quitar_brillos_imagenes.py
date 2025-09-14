@@ -1,12 +1,15 @@
-import cv2
+import argparse
+import os
+
 #import numpy as np
 from pathlib import Path
-import os
-import argparse
+
+import cv2
+
 #from scipy.signal import find_peaks
 
 def quitar_brillos_imagenes(ruta_fuente, ruta_destino, funcion_thresh):
-    umbral = 220# valor de umbral
+    umbral = 220 #50 # valor de umbral
     lista_ficheros = os.scandir(ruta_fuente)
     
     for i, fichero in enumerate(lista_ficheros):
@@ -22,7 +25,7 @@ def quitar_brillos_imagenes(ruta_fuente, ruta_destino, funcion_thresh):
         
         _, imagen_umbralizada = cv2.threshold(imagen_disco, 
                                               umbral, 
-                                              umbral, 
+                                              255, 
                                               funcion_thresh) #cv2.THRESH_TOZERO_INV)
                                         
         cv2.imwrite(ruta_destino/fichero.name, imagen_umbralizada) 
@@ -47,7 +50,7 @@ if __name__ == "__main__":
     origen = Path(args.e)
     #Comprobamos si es una carpeta
     if not origen.exists() or not origen.is_dir():
-        print(f"Error: La ruta 'origen' no existe")
+        print("Error: La ruta 'origen' no existe")
         quit()
     elif not origen.is_dir():
         print(f"Error: La ruta '{origen}' no es una carpeta")

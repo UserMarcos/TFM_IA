@@ -14,7 +14,8 @@ PYTHON_INTERPRETER = python
 ## Install Python dependencies
 .PHONY: requirements
 requirements:
-	pipenv install
+## 	pipenv install
+	dir
 
 
 
@@ -91,7 +92,7 @@ create_environment:
 ## Make dataset
 .PHONY: data
 data: requirements
-	$(PYTHON_INTERPRETER) panificadora/dataset.py
+	$(PYTHON_INTERPRETER) -m panificadora.dataset get-dataset
 
 
 #################################################################################

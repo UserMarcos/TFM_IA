@@ -1,8 +1,9 @@
-import cv2
-import numpy as np
-from pathlib import Path
 import os
+from pathlib import Path
+
+import cv2
 from scipy.signal import find_peaks
+
 
 def picos_valles(histograma):
     hist = histograma.flatten()
