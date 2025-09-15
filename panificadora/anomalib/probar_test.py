@@ -1,9 +1,8 @@
 import anomalib
-from anomalib.data import Folder
-from pathlib import Path
 import os
 import torch
-from datamodule_folder import get_datamodule, get_modelo_CFlow, get_engine
+from datamodule_folder import get_datamodule, get_modelo_CFlow, get_modelo_Dsr, get_engine
+import argparse
 
 # python_env\anomalib\Scripts\activate
 # cd Documents\GitHub\TFM_IA
@@ -14,54 +13,55 @@ if __name__ == '__main__':
     print("Es compatible con cuda:", torch.cuda.is_available())
     print("Es compatible con xpu:", torch.xpu.is_available())
 
-    datamodule = get_datamodule()
+    parser = argparse.ArgumentParser(description="Script que entrena un modelo pasado por argumento")
+    parser.add_argument("-modelo", help="'Cflow': Método Cflow-ad. 'DSR': Método dsr. 'EfficientAd'. 'PatchCore'")
+    parser.add_argument('-bs', '--batch-size', 
+                       default=32, 
+                        type=int, 
+                        metavar='B',
+                        help='train batch size (default: 32)')
+    parser.add_argument('-ep', '--epocas', 
+                        type=int, 
+                        default=25, 
+                        metavar='N',
+                        help='number of meta epochs to train (default: 25)')
 
-
-    '''
+    args = parser.parse_args()
     
-    datamodule = MVTecAD(
-        root=carpeta,  # Path to download/store the dataset
-        category="bottle",  # MVTec category to use
-        train_batch_size=4,  # Number of images per training batch
-        eval_batch_size=4,  # Number of images per validation/test batch
-        num_workers=8,  # Number of parallel processes for data loading
-    )
-
+    for nombre, valor in vars(args).items():
+        print(f"\t{nombre}: {valor}")
     
-    datamodule.setup(stage = "fit")
-
-
-    mi_DataLoader = datamodule.train_dataloader()
-    batch = next(iter(mi_DataLoader))
-
-    print("Formato del batch: ", batch.image.shape)
-    print("Tamaño del batch: ", batch.batch_size)
-
-    item = batch.items[23]
-    print(type(item.image))
-    print("Formato de la imagen: ", batch.items[23].image.shape)
-
-    print(datamodule.train_augmentations)
+    if not args.modelo:
+        print("No se especificó modelo")
+        quit()
+        
+    if args.modelo == 'Cflow':
+        model = get_modelo_CFlow()
+        ckpt_path = "results/Cflow/Bijou_b/latest/weights/lightning/model.ckpt"
+    elif args.modelo == 'Dsr':
+        model = get_modelo_Dsr()
+        ckpt_path = "results/Dsr/Bijou_512/latest/weights/lightning/model.ckpt"
+    elif args.modelo == 'EfficientAd':
+        model = get_modelo_EfficientAd()
+        ckpt_path = "results/EfficientAd/Bijou_b/latest/weights/lightning/model.ckpt"
+    elif args.modelo == 'Patchcore':
+        model = get_modelo_PatchCore()
+        ckpt_path = "results/Patchcore/Bijou_b/latest/weights/lightning/model.ckpt"
+    else:
+        print("modelo no especificado")
+        quit()
+        
+    print(f"Creado el modelo {args.modelo}")
+      
+    datamodule = get_datamodule(args.batch_size)
     
+    print(f"Creado el 'datamodule' con {args.batch_size} como tamaño de batch")
+    #print(model.trainer_arguments)
     
-    model = Patchcore(
-        #backbone="wide_resnet50_2",
-        #layers=["layer2", "layer3"],
-        #coreset_sampling_ratio=0.1,
-        #pre_processor = exportable_transform
-    )
-    '''
-    
-    model = get_modelo_CFlow()
-    
-    print(model.trainer_arguments)
-    
-    engine = get_engine()
-    print("Clase engine creada")
-    
-    #engine.fit(datamodule=datamodule, model=model)
+    engine = get_engine(args.epocas)
+    print(f"Clase engine creada con {args.epocas} épocas")
 
     engine.test(datamodule=datamodule, 
-                model=model, 
-                ckpt_path = "results/Cflow/Bijou_b/latest/weights/lightning/model.ckpt"
+                model= model, 
+                ckpt_path = ckpt_path
                 )

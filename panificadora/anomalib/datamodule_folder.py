@@ -10,7 +10,7 @@ from anomalib.callbacks import TilerConfigurationCallback
 import warnings
 
 def get_datamodule(batch_size):
-    carpeta = Path("data/processed/bijou")
+    carpeta = Path("data/processed/bijou_png_512")
     #carpeta = Path("data/processed/MVTec-AD")
     print("Carpeta del dataset: ", carpeta)
     '''
@@ -23,8 +23,8 @@ def get_datamodule(batch_size):
     # Creamos el data agumentation
     augmentations_train = v2.Compose([
         #v2.Grayscale(num_output_channels=1),
-        v2.Pad(50, 255, "edge"),
-        v2.CenterCrop(256), 
+        #v2.Pad(50, 255, "edge"),
+        #v2.CenterCrop(256), 
         #v2.Resize(128),
         v2.RandomHorizontalFlip(),
         v2.RandomVerticalFlip()   
@@ -38,7 +38,7 @@ def get_datamodule(batch_size):
     ])
     
     datamodule_folder = Folder(
-        name="Bijou_b",
+        name="Bijou_512",
         root=carpeta,
         normal_dir="train",
         abnormal_dir="test",
@@ -47,8 +47,8 @@ def get_datamodule(batch_size):
         eval_batch_size = batch_size,  #
         #num_workers = 1,
         train_augmentations = augmentations_train,
-        val_augmentations = augmentations_valid,
-        test_augmentations = augmentations_valid,
+        #val_augmentations = augmentations_valid,
+        #test_augmentations = augmentations_valid,
         augmentations = None
     )
     
@@ -64,11 +64,11 @@ def get_evaluator():
 
     # Test metrics (more comprehensive)
     test_metrics = [
-        AUROC(fields=["pred_score", "gt_label"], prefix="image_"),     # Image-level AUROC
-        AUPR(fields=["pred_score", "gt_label"], prefix="image_"),
-        #AUROC(fields=["anomaly_map", "gt_mask"], prefix="pixel_"),     # Pixel-level AUROC
-        #AUPR(fields=["anomaly_map", "gt_mask"], prefix="pixel_"),     # Pixel-level AUPRO
-        AUPRO(fields=["anomaly_map", "gt_mask"], prefix="pixel_")
+        AUROC(fields=["pred_score", "gt_label"], prefix="image1_"),     # Image-level AUROC
+        AUPR(fields=["pred_score", "gt_label"], prefix="image2_"),
+        AUROC(fields=["anomaly_map", "gt_mask"], prefix="pixel1_"),     # Pixel-level AUROC
+        AUPR(fields=["anomaly_map", "gt_mask"], prefix="pixel2_"),     # Pixel-level AUPRO
+        AUPRO(fields=["anomaly_map", "gt_mask"], prefix="pixel3_")
         #F1Score(fields=["pred_label", "gt_label"]),   # Image-level F1
         #F1Score(fields=["pred_mask", "gt_mask"])      # Pixel-level F1
     ]
@@ -104,13 +104,15 @@ def get_modelo_Dsr():
     # Create evaluator with both sets
     evaluator = get_evaluator()
 
+
     modelo = Dsr(
-        #evaluator = evaluator
+        evaluator = evaluator
     )
     
-    modelo.save_hyperparameters(ignore=["evaluator"])
+    #modelo.save_hyperparameters(ignore=["evaluator"])
+    #modelo.model.evaluator.to("cuda")
     
-    print(type(modelo.model))
+    #print(type(modelo.model))
     
     return modelo
 
@@ -157,7 +159,7 @@ def get_engine(epocas):
         precision= "bf16-mixed", #"16-mixed",
         #callbacks=[tiler_config_callback]
         #default_root_dir=Path("./mis_resultados")
-        #accelerator="cpu"
+        accelerator="cpu"
     )
 
     return motor

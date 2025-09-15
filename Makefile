@@ -66,13 +66,16 @@ probar_anomalib:
 	$(PYTHON_INTERPRETER) panificadora/anomalib/pruebas.py \
 		-modelo Dsr \
 		-bs 8 \
-		-ep 3
+		-ep 1
 	
 inferencia_anomalib:
 	$(PYTHON_INTERPRETER) panificadora/anomalib/probar_inferencia.py
 
 test_anomalib:
-	$(PYTHON_INTERPRETER) panificadora/anomalib/probar_test.py
+	$(PYTHON_INTERPRETER) panificadora/anomalib/probar_test.py \
+		-modelo Dsr \
+		-bs 8 \
+		-ep 1
 
 ## Set up Python interpreter environment
 .PHONY: create_environment

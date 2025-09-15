@@ -21,7 +21,7 @@ if __name__ == '__main__':
                         help='train batch size (default: 32)')
     parser.add_argument('-ep', '--epocas', 
                         type=int, 
-                        default=25, 
+                         default=25, 
                         metavar='N',
                         help='number of meta epochs to train (default: 25)')
                         
