@@ -1,7 +1,9 @@
+import os
+from pathlib import Path
+
 import py7zr
 from tqdm import tqdm
-from pathlib import Path
-import os
+
 
 class ExtractProgressBar(py7zr.callbacks.ExtractCallback, tqdm):
     def __init__(self, *args, total_bytes, **kwargs):
@@ -23,7 +25,7 @@ def descomprimir(nombre_fichero, carpeta_salida):
                  unit_scale=True,
                  miniters=1,
                  total_bytes=archive_info.uncompressed,
-                 desc=f"Descomprimiendo") as progress:
+                 desc="Descomprimiendo") as progress:
             archive.extractall(path=carpeta_salida, callback=progress)
 
 if __name__ == "__main__":
@@ -35,5 +37,5 @@ if __name__ == "__main__":
         descomprimir(fichero_7z, destino)
         print(f"Archivo Dataset.7z descomprimido en {os.path.abspath(destino)}")
     else:
-        print(f"El fichero no existe")
+        print("El fichero no existe")
     

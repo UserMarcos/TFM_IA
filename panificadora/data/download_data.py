@@ -1,11 +1,10 @@
-import requests
-from pathlib import Path
-from zipfile import ZipFile
 import base64
 import os
+from pathlib import Path
 import re
+from urllib.parse import parse_qsl, urlencode, urlparse, urlunparse
+
 import requests
-from urllib.parse import urlparse, urlunparse, parse_qsl, urlencode
 from tqdm import tqdm
 
 SESSION_HEADERS = {
@@ -114,6 +113,7 @@ def save_stream(resp: requests.Response, out_path: str | None) -> str:
     return file_path
 
 if __name__ == "__main__":
+    # https://alumnosviu-my.sharepoint.com/:u:/g/personal/mcastroc_student_universidadviu_com/ESa_Jg0GkC9HrHcJgEZnyFgBU3AeKas8gAMJmpdeDLyvWA?e=rWRPcf
     url_zip = "https://alumnosviu-my.sharepoint.com/:u:/g/personal/mcastroc_student_universidadviu_com/EeNC2Yzg6CZFl8f4v8ikuEgBKAixioBvWTVkkQgdwN-xTg?e=27lQdT&download=1"
     destino = Path("data/raw/mis_imagenes")
     destino.mkdir(parents=True, exist_ok=True)

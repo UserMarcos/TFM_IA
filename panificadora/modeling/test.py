@@ -8,7 +8,7 @@ from panificadora.config import MODELS_DIR, PROCESSED_DATA_DIR
 from panificadora.modeling.utils import *
 
 
-def predict( nombre_modelo: str,
+def test( nombre_modelo: str,
               batch_size: int = 32
             ):
                 
@@ -25,12 +25,6 @@ def predict( nombre_modelo: str,
     engine = get_engine()
     print("Clase engine creada")
     
-    prediciones = engine.predict(model=model, 
-                                datamodule = datamodule,
-                                #dataloaders = mi_DataLoader,
-                                ckpt_path = MODELS_DIR / nombre_fichero_pesos
-                                )
-    
     #engine.test(datamodule=datamodule, 
     #            model= model, 
     #            ckpt_path = MODELS_DIR / nombre_fichero_pesos
@@ -39,4 +33,4 @@ def predict( nombre_modelo: str,
 
 
 if __name__ == "__main__":
-    typer.run(predict)
+    typer.run(test)
