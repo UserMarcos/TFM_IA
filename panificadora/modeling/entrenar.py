@@ -10,7 +10,8 @@ from panificadora.modeling.utils import *
 
 def entrenar( nombre_modelo: str,
               batch_size: int = 32,
-              epocas: int = 10
+              epocas: int = 10,
+              nVersion: int = 0
             ):
                 
     print("batch_size: ", batch_size)
@@ -18,7 +19,7 @@ def entrenar( nombre_modelo: str,
     print("Carpeta con datos procesados: ", PROCESSED_DATA_DIR)
     print("Carpeta con modelos: ", MODELS_DIR)            
     
-    model, nombre_fichero_pesos = get_modelo(nombre_modelo)
+    model, nombre_fichero_pesos = get_modelo(nombre_modelo, nVersion = nVersion)
     
     if model is None:
         print("No hay modelo. Terminamos")
@@ -33,7 +34,13 @@ def entrenar( nombre_modelo: str,
     engine = get_engine(epocas, nombre_fichero_pesos)
     print(f"Clase engine creada con {epocas} épocas y '{nombre_fichero_pesos}' como fichero de pesos")
     
-    #engine.fit(datamodule=datamodule, model=model)
+    ckpt_path = MODELS_DIR / (nombre_fichero_pesos + ".ckpt")
+    print(f"Fichero de pesos: '{ckpt_path}'")
+    if not ckpt_path.exists() or not ckpt_path.is_file():
+        print("No existe el fichero de pesos")
+        ckpt_path = None
+    
+    engine.fit(datamodule=datamodule, model=model, ckpt_path = ckpt_path)
 
 
 if __name__ == "__main__":

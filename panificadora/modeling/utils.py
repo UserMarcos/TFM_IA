@@ -151,7 +151,7 @@ def _get_modelo_PatchCore():
     )
     return modelo
     
-def get_modelo(nombre_modelo):
+def get_modelo(nombre_modelo, nVersion=0):
     
     if nombre_modelo.lower() == 'cflow':
         print("Modelo CFlow-AD")
@@ -160,7 +160,7 @@ def get_modelo(nombre_modelo):
     elif nombre_modelo.lower() == 'dsr':
         print("Modelo Dsr")
         model = _get_modelo_Dsr()
-        nombre_fichero_pesos = "Dsr_best"
+        nombre_fichero_pesos = "Dsr_best_6"
     elif nombre_modelo.lower() == 'efficientad':
         print("Modelo EfficientAD")
         model = _get_modelo_EfficientAd()
@@ -168,12 +168,14 @@ def get_modelo(nombre_modelo):
     elif nombre_modelo.lower() == 'patchcore':
         print("Modelo PatchCore")
         model = _get_modelo_PatchCore()
-        nombre_fichero_pesos = "PatchCore_best"
+        nombre_fichero_pesos = "PatchCore_best.ckpt"
     else:
         print(f"Modelo '{nombre_modelo}' no válido")
         model = None
         nombre_fichero_pesos = ""
-        
+     
+    if nVersion > 0:
+        nombre_fichero_pesos = nombre_fichero_pesos + "-v" + str(nVersion)
     return (model, nombre_fichero_pesos)
 
 def get_engine(epocas=1, model_name = "best"):

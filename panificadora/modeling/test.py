@@ -9,14 +9,15 @@ from panificadora.modeling.utils import *
 
 
 def test( nombre_modelo: str,
-              batch_size: int = 32
+              batch_size: int = 32,
+              nVersion: int = 0
             ):
                 
     print("batch_size: ", batch_size)
     print("Carpeta con datos procesados: ", PROCESSED_DATA_DIR)
     print("Carpeta con modelos: ", MODELS_DIR)            
         
-    model, nombre_fichero_pesos = get_modelo(nombre_modelo)     
+    model, nombre_fichero_pesos = get_modelo(nombre_modelo, nVersion)     
     print(f"Creado el modelo {nombre_modelo}")
     
     datamodule = get_datamodule(batch_size)  
@@ -25,10 +26,13 @@ def test( nombre_modelo: str,
     engine = get_engine()
     print("Clase engine creada")
     
-    #engine.test(datamodule=datamodule, 
-    #            model= model, 
-    #            ckpt_path = MODELS_DIR / nombre_fichero_pesos
-    #            )
+    ckpt_path = MODELS_DIR / (nombre_fichero_pesos+".ckpt")
+    print(ckpt_path)
+    
+    engine.test(datamodule=datamodule, 
+                model= model, 
+                ckpt_path = ckpt_path
+                )
        
 
 
